@@ -1,40 +1,48 @@
 import * as React from "react";
-import { Image, StyleSheet, View, Text, Pressable, TextInput } from "react-native";
+import { Image, StyleSheet, View, Text, Pressable, TextInput, Alert } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Color, FontFamily, FontSize, Border } from "../../../GlobalStyles";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
 import config from "../../../config.json"
+import { useFonts, Lato_700Bold, Lato_400Regular } from "@expo-google-fonts/lato";
 
-function cadastrar(tag, senha, senhaConf, navigation) {
-    navigation.navigate('CadastroFim')
-    // const cadastro1 = AsyncStorage.getItem('cadastro1')
-    // console.log(JSON.stringify(cadastro1))
-    // const [dia, mes, ano] = cadastro1.date.split('/')
-    // const dataFormatada = new Date(ano, mes - 1, dia);
+async function cadastrar(tag, senha, senhaConf, navigation) {
+    const nome = await AsyncStorage.getItem('CadastroNome')
+    const email = await AsyncStorage.getItem('CadastroEmail')
+    const date = await AsyncStorage.getItem('CadastroDate')
 
-    // const payload = {
-    //     Email: cadastro1.email,
-    //     Nome: cadastro1.nome,
-    //     DataNascimento: dataFormatada,
-    //     Tag: tag,
-    //     NomeUsuario: cadastro1.nome,
-    //     Senha: senha
-    // }
-    // console.log(payload)
+    const [dia, mes, ano] = date.split('/')
+    const dataFormatada = new Date(ano, mes - 1, dia);
 
-    // const response = axios.post(`${config.url}/User`, payload)
+    const payload = {
+        Email: email,
+        Nome: nome,
+        DataNascimento: dataFormatada,
+        Tag: tag,
+        NomeUsuario: nome,
+        Senha: senha
+    }
+    console.log(JSON.stringify(payload))
 
-    // if (response.status != 200) {
-    //     Alert.alert(
-    //         'Erro',
-    //         'Ocorreu um erro ao logar, tente novamente',
-    //         [{ text: 'OK' }]
-    //     )
-    //     console.log('erro ao cadastrar')
-    // } else {
-    //     navigation.navigate('CadastroFim')
-    // }
+    const response = await axios.post(`${config.url}/User`, payload).catch((err) => {
+        Alert.alert(
+            'Erro',
+            'Ocorreu um erro ao criar sua conta, tente novamente',
+            [{ text: 'OK' }]
+        )
+        navigation.navigate('Login')
+    })
+    console.log(response)
+    if (response?.status != 200) {
+        Alert.alert(
+            'Erro',
+            'Ocorreu um erro ao logar, tente novamente',
+            [{ text: 'OK' }]
+        )
+    } else {
+        navigation.navigate('CadastroFim')
+    }
 }
 export default function Cadastro2({ navigation }) {
     const [tag, onChangeTag] = React.useState('@Tag');
@@ -42,6 +50,11 @@ export default function Cadastro2({ navigation }) {
     const [senhaConf, onChangeSenhaConf] = React.useState('Confirme a senha');
     const [senhaDiff, onChangeSenhaDiff] = React.useState('');
     const [disable, onChangeSenhaDisable] = React.useState('false');
+
+    let [fontsLoaded] = useFonts({
+        Lato_700Bold,
+        Lato_400Regular
+    })
 
     return (
         <View style={styles.signup2}>
@@ -59,7 +72,7 @@ export default function Cadastro2({ navigation }) {
             <Text style={styles.criar}>Criar</Text>
             <Pressable
                 style={[styles.rectangleGroup, styles.groupLayout]}
-                onPress={() => cadastrar(tag, senha, senhaConf, navigation)}
+                onPress={async () => await cadastrar(tag, senha, senhaConf, navigation)}
             >
                 <LinearGradient
                     style={[styles.groupItem, styles.groupLayout]}

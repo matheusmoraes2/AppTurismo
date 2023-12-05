@@ -4,19 +4,23 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Color, FontFamily, FontSize, Border } from "../../../GlobalStyles";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text'
+import { useFonts, Lato_700Bold, Lato_400Regular } from "@expo-google-fonts/lato";
 
 
 async function cadastrar(nome, email, date) {
-    AsyncStorage.setItem('cadastro1', {
-        nome: nome,
-        email: email,
-        date: date
-    })
+    await AsyncStorage.setItem('CadastroNome', nome)
+    await AsyncStorage.setItem('CadastroEmail', email)
+    await AsyncStorage.setItem('CadastroDate', date)
 }
 export default function Cadastro1({ navigation }) {
     const [nome, onChangeNome] = React.useState('Nome');
     const [email, onChangeEmail] = React.useState('E-mail');
     const [date, onChangeDate] = React.useState('Data de nascimento');
+
+    let [fontsLoaded] = useFonts({
+        Lato_700Bold,
+        Lato_400Regular
+    })
 
     return (
         <View style={styles.signup1}>

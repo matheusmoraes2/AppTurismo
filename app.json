@@ -1,5 +1,8 @@
 {
   "expo": {
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
     "name": "Turismo",
     "slug": "Turismo",
     "version": "1.0.0",

@@ -7,14 +7,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import config from "../../../config.json"
 import axios from "axios";
 
-function logar(email, senha) {
+async function logar(email, senha, navigation) {
   const url = config.url
   const payload = {
     Login: email,
     Password: senha
   }
 
-  const response = axios.post(`${url}/User/Login`, payload).catch((err) => {
+  const response = await axios.post(`${url}/User/Login`, payload).catch((err) => {
     Alert.alert(
       'Erro',
       'Ocorreu um erro ao logar, tente novamente',
@@ -22,12 +22,14 @@ function logar(email, senha) {
     )
   })
 
-  if (response.data?.status != 'Ok') {
+  if (response?.status != 200) {
     Alert.alert(
       'Erro',
       'Email ou senha incorretos',
       [{ text: 'OK' }]
     )
+  } else {
+    navigation.navigate('Home')
   }
 }
 export default function Login({ navigation }) {
@@ -95,7 +97,7 @@ export default function Login({ navigation }) {
       <Text style={styles.entrar}>Entrar</Text>
       <Pressable
         style={[styles.rectangleContainer, styles.groupItemLayout]}
-        onPress={() => logar(text, senha)}
+        onPress={async () => await logar(text, senha, navigation)}
       >
         <LinearGradient
           style={[styles.groupItem, styles.groupItemLayout]}
